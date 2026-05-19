@@ -3,7 +3,7 @@ export default function Home() {
     <div className="flex flex-1 items-center justify-center bg-zinc-50 px-6 py-16 text-zinc-900 dark:bg-black dark:text-zinc-50">
       <main className="w-full max-w-3xl rounded-3xl border border-zinc-200/70 bg-white/80 p-10 shadow-sm backdrop-blur dark:border-zinc-800 dark:bg-zinc-950/80">
         <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">
-          GST Billing & Business Management Platform
+          Store Management System
         </h1>
         
         <div className="mt-8 flex flex-col gap-3 sm:flex-row">
