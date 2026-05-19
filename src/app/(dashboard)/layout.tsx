@@ -6,7 +6,7 @@ import { BusinessModel } from "@/models/business";
 import type { CSSProperties } from "react";
 
 export const metadata = {
-  title: "Dashboard - GST Billing",
+  title: "Dashboard - Store Management System",
 };
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {

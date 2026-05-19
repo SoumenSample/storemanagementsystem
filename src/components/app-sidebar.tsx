@@ -71,7 +71,7 @@ type AppSidebarProps = React.ComponentProps<typeof Sidebar> & {
 }
 
 export function AppSidebar({
-  workspaceName = "GST Billing",
+  workspaceName = "Store Management System",
   workspaceLogoUrl,
   userName = "Guest user",
   userEmail = "guest@example.com",

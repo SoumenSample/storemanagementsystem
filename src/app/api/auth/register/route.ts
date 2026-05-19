@@ -62,7 +62,7 @@ export async function POST(request: Request) {
 
   await sendMail({
     to: user.email,
-    subject: "Verify your GST Billing account",
+    subject: "Verify your Store Management System account",
     text: `Verify your email: ${verifyUrl}`,
     html: `
       <div style="font-family: Arial, sans-serif; line-height: 1.5;">
