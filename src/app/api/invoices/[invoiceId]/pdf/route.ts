@@ -59,9 +59,9 @@ export async function GET(
     business,
     invoiceQrDataUrl,
   });
-  const buffer = await renderToBuffer(element as React.ReactElement);
+  const buffer = await renderToBuffer(element as React.ReactElement<any>);
 
-  return new NextResponse(buffer, {
+  return new NextResponse(buffer as any, {
     headers: {
       "Content-Type": "application/pdf",
       "Content-Disposition": `attachment; filename=invoice-${invoice.invoiceNumber}.pdf`,

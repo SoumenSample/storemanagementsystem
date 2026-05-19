@@ -19,7 +19,7 @@ interface EditProductModalProps {
   } | null;
   formData: Record<string, any>;
   onFormChange: (key: string, value: any) => void;
-  onSave: (e: React.FormEvent) => void;
+  onSave: (e: React.FormEvent<HTMLFormElement>) => void;
   isLoading?: boolean;
   error?: string;
   categories: Array<{ _id: string; name: string; gstRate: number }>;
@@ -53,7 +53,7 @@ export function EditProductModal({
 }: EditProductModalProps) {
   if (!product) return null;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     onSave(e);
   };

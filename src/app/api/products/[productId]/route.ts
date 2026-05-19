@@ -3,6 +3,7 @@ import { auth } from "@/lib/auth";
 import { connectToDatabase } from "@/lib/db";
 import { ProductModel } from "@/models/product";
 import { productSchema } from "@/schemas/product";
+import { requireInventoryAccess } from "@/lib/access";
 
 export async function PATCH(
   request: Request,
@@ -54,7 +55,7 @@ export async function PATCH(
     if (payload.sku && payload.sku !== product.sku) {
       const existing = await ProductModel.findOne({
         sku: payload.sku,
-        businessId: session.user.businessId,
+        businessId: access.session.user.businessId,
         isDeleted: false,
         _id: { $ne: productId },
       });

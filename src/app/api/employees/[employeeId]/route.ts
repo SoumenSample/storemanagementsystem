@@ -6,7 +6,7 @@ import { EmployeeModel } from "@/models/employee";
 import { UserModel } from "@/models/user";
 import { updateEmployeeSchema } from "@/schemas/employee";
 import { rateLimit } from "@/lib/rate-limit";
-import { ensureEmployeeAccess } from "@/lib/employee-access";
+import { ensureEmployeeAccess, type EmployeeBusinessRole } from "@/lib/employee-access";
 import { ObjectId } from "mongodb";
 import { z } from "zod";
 
@@ -132,7 +132,7 @@ export async function PUT(
       );
     }
 
-    const businessRole = parsed.data.businessRole;
+    const businessRole = parsed.data.businessRole as EmployeeBusinessRole | undefined;
     const updateData = { ...parsed.data } as Record<string, unknown>;
     delete updateData.businessRole;
 

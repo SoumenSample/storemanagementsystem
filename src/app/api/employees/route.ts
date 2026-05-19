@@ -6,7 +6,7 @@ import { EmployeeModel } from "@/models/employee";
 import { UserModel } from "@/models/user";
 import { createEmployeeSchema } from "@/schemas/employee";
 import { rateLimit } from "@/lib/rate-limit";
-import { ensureEmployeeAccess } from "@/lib/employee-access";
+import { ensureEmployeeAccess, type EmployeeBusinessRole } from "@/lib/employee-access";
 import { z } from "zod";
 
 const querySchema = z.object({
@@ -111,7 +111,7 @@ export async function POST(request: Request) {
 
     await connectToDatabase();
 
-    const businessRole = parsed.data.businessRole;
+    const businessRole = parsed.data.businessRole as EmployeeBusinessRole | undefined;
 
     const [existingEmployeeId, existingEmail] = await Promise.all([
       EmployeeModel.findOne({
@@ -120,7 +120,7 @@ export async function POST(request: Request) {
       }).lean(),
       EmployeeModel.findOne({
         businessId: session.user.businessId,
-        email: parsed.data.email,
+        email: parsed.data.email as string,
       }).lean(),
     ]);
 
@@ -141,9 +141,9 @@ export async function POST(request: Request) {
     if (businessRole) {
       accessResult = await ensureEmployeeAccess({
         businessId: session.user.businessId,
-        name: `${parsed.data.firstName} ${parsed.data.lastName}`,
-        email: parsed.data.email,
-        phone: parsed.data.phone,
+        name: `${parsed.data.firstName as string} ${parsed.data.lastName as string}`,
+        email: parsed.data.email as string,
+        phone: parsed.data.phone as string,
         role: businessRole,
       });
     }

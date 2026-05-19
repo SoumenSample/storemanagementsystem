@@ -5,6 +5,7 @@ import { ProductModel } from "@/models/product";
 import { productSchema } from "@/schemas/product";
 import { rateLimit } from "@/lib/rate-limit";
 import { addShelfInventory } from "@/services/shelfService";
+import { requireInventoryAccess } from "@/lib/access";
 import { z } from "zod";
 
 const querySchema = z.object({
@@ -118,7 +119,7 @@ export async function POST(request: Request) {
 
     if (initialStock > 0) {
       await addShelfInventory({
-        businessId: access.session.user.businessId,
+        businessId: access.session.user.businessId as string,
         productId: product._id.toString(),
         quantity: initialStock,
         notes: "Opening stock",

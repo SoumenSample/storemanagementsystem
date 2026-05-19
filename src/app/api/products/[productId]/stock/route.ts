@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { connectToDatabase } from "@/lib/db";
 import { adjustStock } from "@/services/productService";
+import { requireInventoryAccess } from "@/lib/access";
 import { z } from "zod";
 
 const adjustSchema = z.object({
@@ -33,7 +34,7 @@ export async function POST(
 
   const params = await context.params;
   const product = await adjustStock({
-    businessId: access.session.user.businessId,
+    businessId: access.session.user.businessId as string,
     productId: params.productId,
     quantity: parsed.data.quantity,
     shelfId: parsed.data.shelfId || undefined,

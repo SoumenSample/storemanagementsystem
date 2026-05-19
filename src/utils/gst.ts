@@ -39,7 +39,7 @@ export function resolveProductGstRate(
   categoryGstRate?: number | null
 ): GstRate | null {
   if (productGstRate === null || productGstRate === undefined) {
-    return categoryGstRate ?? null;
+    return (categoryGstRate as GstRate) ?? null;
   }
 
   if (

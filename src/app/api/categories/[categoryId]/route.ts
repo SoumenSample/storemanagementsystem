@@ -39,6 +39,7 @@ export async function PUT(
     await connectToDatabase();
 
     const params = await context.params;
+    const session = access.session;
     const category = await CategoryModel.findOne({
       _id: params.categoryId,
       businessId: session.user.businessId,

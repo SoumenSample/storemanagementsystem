@@ -18,7 +18,7 @@ export const createEmployeeSchema = z.object({
   ifscCode: z.string().regex(/^[A-Z]{4}0[A-Z0-9]{6}$/).optional().or(z.literal("")),
   designation: z.string().min(2),
   department: z.string().min(2),
-  employeeId: z.string().min(2).unique ?? z.string().min(2),
+  employeeId: z.string().min(2),
   dateOfJoining: z.coerce.date(),
   employmentType: z.enum(["Full-Time", "Part-Time", "Contract", "Intern"]),
   status: z.enum(["Active", "Inactive", "On Leave", "Terminated"]).default("Active"),

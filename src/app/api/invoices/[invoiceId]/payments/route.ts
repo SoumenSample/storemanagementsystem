@@ -31,7 +31,7 @@ export async function POST(
 
   const params = await context.params;
   const result = await recordPayment({
-    businessId: access.session.user.businessId,
+    businessId: access.session.user.businessId as string,
     invoiceId: params.invoiceId,
     amount: parsed.data.amount,
     method: parsed.data.method,

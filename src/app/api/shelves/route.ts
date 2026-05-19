@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { connectToDatabase } from "@/lib/db";
 import { createShelfLocation, getShelfOverview } from "@/services/shelfService";
+import { requireInventoryAccess } from "@/lib/access";
 import { z } from "zod";
 
 const shelfSchema = z.object({
@@ -73,7 +74,7 @@ export async function POST(request: Request) {
   await connectToDatabase();
 
   const shelf = await createShelfLocation({
-    businessId: access.session.user.businessId,
+    businessId: access.session.user.businessId as string,
     label: parsed.data.label,
     locationType: parsed.data.locationType,
     code: parsed.data.code || undefined,
