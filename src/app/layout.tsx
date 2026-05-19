@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "GST Billing Platform",
+  title: "STORE MANAGEMENT SYSTEM",
   description: "Multi-tenant GST billing, inventory, POS, and business management platform.",
 };
 
