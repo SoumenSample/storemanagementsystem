@@ -146,6 +146,13 @@ const authConfig: NextAuthConfig = {
     }),
   ],
   callbacks: {
+    async redirect({ url, baseUrl }) {
+      // Ensure we're redirecting to a safe URL within our app
+      if (url.startsWith("/")) return `${baseUrl}${url}`;
+      // Allow callback to external URLs if it's from the same domain
+      else if (new URL(url).origin === baseUrl) return url;
+      return baseUrl;
+    },
     async jwt({ token, user }) {
       if (user) {
         token.userId = user.id;

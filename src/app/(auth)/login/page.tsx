@@ -5,14 +5,12 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { loginSchema } from "@/schemas/auth";
 import type { z } from "zod";
-import { signIn, getSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { signIn } from "next-auth/react";
 import Link from "next/link";
 
 type LoginForm = z.infer<typeof loginSchema>;
 
 export default function LoginPage() {
-  const router = useRouter();
   const [message, setMessage] = useState<string | null>(null);
   const form = useForm<LoginForm>({
     resolver: zodResolver(loginSchema),
@@ -21,38 +19,30 @@ export default function LoginPage() {
 
   const onSubmit = async (values: LoginForm) => {
     setMessage(null);
-    const response = await signIn("credentials", {
-      email: values.email,
-      password: values.password,
-      remember: values.remember ? "true" : "false",
-      redirect: false,
-    });
 
-    if (response?.error) {
-      setMessage("Invalid login. Please check your credentials.");
-      return;
+    try {
+      const response = await signIn("credentials", {
+        email: values.email,
+        password: values.password,
+        remember: values.remember ? "true" : "false",
+        redirect: false,
+      });
+
+      if (response?.error) {
+        setMessage("Invalid login. Please check your credentials.");
+        return;
+      }
+
+      if (!response?.ok) {
+        setMessage("Login failed. Please try again.");
+        return;
+      }
+
+      window.location.assign("/dashboard");
+    } catch (error) {
+      setMessage("An error occurred. Please try again.");
+      console.error("Sign in error:", error);
     }
-
-    const session = await getSession();
-    const role = session?.user?.globalRole;
-    const businessRole = session?.user?.role;
-
-    if (role === "SUPER_ADMIN") {
-      router.push("/super-admin/dashboard");
-      return;
-    }
-
-    if (businessRole === "CASHIER") {
-      router.push("/pos");
-      return;
-    }
-
-    if (businessRole === "INVENTORY_MANAGER") {
-      router.push("/products");
-      return;
-    }
-
-    router.push("/dashboard");
   };
 
   return (

@@ -1,16 +1,21 @@
-import { getToken } from "next-auth/jwt";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import { auth } from "@/lib/auth";
 
 function isPublicApi(pathname: string) {
   return (
     pathname.startsWith("/api/auth") ||
     pathname.startsWith("/api/health") ||
-    pathname.startsWith("/api/uploads")
+    pathname.startsWith("/api/uploads") ||
+    pathname === "/login" ||
+    pathname === "/signup" ||
+    pathname === "/forgot-password" ||
+    pathname === "/reset-password" ||
+    pathname === "/verify-email"
   );
 }
 
-export default async function middleware(req: NextRequest) {
+export default auth(async (req: NextRequest) => {
   const { pathname } = req.nextUrl;
 
   if (isPublicApi(pathname)) return NextResponse.next();
@@ -30,25 +35,22 @@ export default async function middleware(req: NextRequest) {
     pathname.startsWith("/super-admin") ||
     pathname.startsWith("/api")
   ) {
-    const token = await getToken({
-      req,
-      secret: process.env.NEXTAUTH_SECRET,
-    });
+    const user = req.auth?.user;
 
-    if (!token?.userId) {
+    if (!user?.id) {
       return NextResponse.redirect(new URL("/login", req.url));
     }
 
-    const isSuperAdmin = token.globalRole === "SUPER_ADMIN";
+    const isSuperAdmin = user.globalRole === "SUPER_ADMIN";
     if (pathname.startsWith("/super-admin") && !isSuperAdmin) {
       return NextResponse.redirect(new URL("/dashboard", req.url));
     }
 
-    if (!isSuperAdmin && !token.businessId) {
+    if (!isSuperAdmin && !user.businessId) {
       return NextResponse.redirect(new URL("/onboarding", req.url));
     }
 
-    const role = (token.role as string | undefined) ?? null;
+    const role = (user.role as string | undefined) ?? null;
     const isOwnerOrAdmin = role === "OWNER" || role === "ADMIN";
 
     if (!isOwnerOrAdmin) {
@@ -65,14 +67,14 @@ export default async function middleware(req: NextRequest) {
 
       if (role === "CASHIER") {
         const allowed = cashierAllowed.some((prefix) => pathname.startsWith(prefix));
-        if (!allowed && !pathname.startsWith("/api/auth") && !pathname.startsWith("/api/health") && !pathname.startsWith("/api/uploads")) {
+        if (!allowed) {
           return NextResponse.redirect(new URL("/pos", req.url));
         }
       }
 
       if (role === "INVENTORY_MANAGER") {
         const allowed = inventoryAllowed.some((prefix) => pathname.startsWith(prefix));
-        if (!allowed && !pathname.startsWith("/api/auth") && !pathname.startsWith("/api/health") && !pathname.startsWith("/api/uploads")) {
+        if (!allowed) {
           return NextResponse.redirect(new URL("/products", req.url));
         }
       }
@@ -80,7 +82,7 @@ export default async function middleware(req: NextRequest) {
   }
 
   return NextResponse.next();
-}
+});
 
 export const config = {
   matcher: [
