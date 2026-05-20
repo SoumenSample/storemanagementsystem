@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
+import type { NextAuthRequest } from "next-auth";
 import { auth } from "@/lib/auth";
 
 function isPublicApi(pathname: string) {
@@ -15,7 +15,7 @@ function isPublicApi(pathname: string) {
   );
 }
 
-export default auth(async (req: NextRequest) => {
+export default auth(async (req: NextAuthRequest) => {
   const { pathname } = req.nextUrl;
 
   if (isPublicApi(pathname)) return NextResponse.next();
