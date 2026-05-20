@@ -1,6 +1,7 @@
+import { getToken } from "next-auth/jwt";
 import { NextResponse } from "next/server";
-import type { NextAuthRequest } from "next-auth";
-import { auth } from "@/lib/auth";
+import type { NextRequest } from "next/server";
+import { env } from "@/lib/env";
 
 function isPublicApi(pathname: string) {
   return (
@@ -15,7 +16,7 @@ function isPublicApi(pathname: string) {
   );
 }
 
-export default auth(async (req: NextAuthRequest) => {
+export default async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
   if (isPublicApi(pathname)) return NextResponse.next();
@@ -35,22 +36,31 @@ export default auth(async (req: NextAuthRequest) => {
     pathname.startsWith("/super-admin") ||
     pathname.startsWith("/api")
   ) {
-    const user = req.auth?.user;
+    const isSecure = req.nextUrl.protocol === "https:";
+    const cookieName = isSecure
+      ? "__Secure-authjs.session-token"
+      : "authjs.session-token";
 
-    if (!user?.id) {
+    const token = await getToken({
+      req,
+      secret: env.NEXTAUTH_SECRET,
+      cookieName,
+    });
+
+    if (!token?.userId) {
       return NextResponse.redirect(new URL("/login", req.url));
     }
 
-    const isSuperAdmin = user.globalRole === "SUPER_ADMIN";
+    const isSuperAdmin = token.globalRole === "SUPER_ADMIN";
     if (pathname.startsWith("/super-admin") && !isSuperAdmin) {
       return NextResponse.redirect(new URL("/dashboard", req.url));
     }
 
-    if (!isSuperAdmin && !user.businessId) {
+    if (!isSuperAdmin && !token.businessId) {
       return NextResponse.redirect(new URL("/onboarding", req.url));
     }
 
-    const role = (user.role as string | undefined) ?? null;
+    const role = (token.role as string | undefined) ?? null;
     const isOwnerOrAdmin = role === "OWNER" || role === "ADMIN";
 
     if (!isOwnerOrAdmin) {
@@ -82,7 +92,7 @@ export default auth(async (req: NextAuthRequest) => {
   }
 
   return NextResponse.next();
-});
+}
 
 export const config = {
   matcher: [
